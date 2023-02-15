@@ -2,7 +2,7 @@
 # encoding: utf-8
 # python 3.9.2
 # content_coder_py
-# updated on: 2023-02-01
+# updated on: 2023-02-14
 # by Ryan L. Boyd, Ph.D.
 # ryan@ryanboyd.io
 
@@ -271,12 +271,13 @@ class ContentCoder:
                 resultsRawFreq['BigWords'] += int(1)
                 resultsRelativeFreq['BigWords'] += singleWordRelFreqValue
 
-        resultsRelativeFreq['AllPunct'] = resultsRawFreq['AllPunct'] / resultsRawFreq['WC']
-        resultsRelativeFreq['Period'] = resultsRawFreq['Period'] / resultsRawFreq['WC']
-        resultsRelativeFreq['Comma'] = resultsRawFreq['Comma'] / resultsRawFreq['WC']
-        resultsRelativeFreq['QMark'] = resultsRawFreq['QMark'] / resultsRawFreq['WC']
-        resultsRelativeFreq['Exclam'] = resultsRawFreq['Exclam'] / resultsRawFreq['WC']
-        resultsRelativeFreq['Apostro'] = resultsRawFreq['Apostro'] / resultsRawFreq['WC']
+        if resultsRawFreq['WC'] > 0
+            resultsRelativeFreq['AllPunct'] = resultsRawFreq['AllPunct'] / resultsRawFreq['WC']
+            resultsRelativeFreq['Period'] = resultsRawFreq['Period'] / resultsRawFreq['WC']
+            resultsRelativeFreq['Comma'] = resultsRawFreq['Comma'] / resultsRawFreq['WC']
+            resultsRelativeFreq['QMark'] = resultsRawFreq['QMark'] / resultsRawFreq['WC']
+            resultsRelativeFreq['Exclam'] = resultsRawFreq['Exclam'] / resultsRawFreq['WC']
+            resultsRelativeFreq['Apostro'] = resultsRawFreq['Apostro'] / resultsRawFreq['WC']
 
         # last thing for us to do is make sure that any word with an asterisk in it has that
         # asterisk escaped. we do this after we count BigWords just so we don't throw things off
