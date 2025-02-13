@@ -19,9 +19,7 @@ ContentCoder is a Python-based text analysis tool that enables users to process 
 Make sure you have Python 3.9+ installed. Clone this repository and install dependencies:
 
 ```bash
-git clone https://github.com/your-repo/ContentCoder.git
-cd ContentCoder
-pip install -r requirements.txt
+pip install contentcoder
 ```
 
 ---
@@ -94,8 +92,7 @@ Analyzes a given text and returns a dictionary of results.
 
 #### **Example Usage:**
 ```python
-result = cc.Analyze("Hello world! This is a test sentence.", returnTokens=True)
-print(result['tokenizedText'])  # ['hello', 'world', 'this', 'is', 'a', 'test', 'sentence']
+result = cc.Analyze("Hello world! This is a test sentence.", returnTokens=relativeFreq=True)
 ```
 
 ---
