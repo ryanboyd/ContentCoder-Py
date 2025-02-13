@@ -197,8 +197,7 @@ with open("Comments.csv", "r", encoding="utf-8-sig") as csvfile:
     reader = csv.DictReader(csvfile)
     total_lines = sum(1 for _ in open("Comments.csv")) - 1  # Count rows
 
-    csvfile.seek(0)  # Reset file pointer
-    for row in tqdm(reader, total=total_lines, desc="Processing", unit="comment"):
+    for row in tqdm(reader, desc="Processing", unit=" comments"):
         text = row["body"]
         result = cc.Analyze(text)
 ```
@@ -227,7 +226,7 @@ Pull requests are welcome! If you find bugs or have feature requests, open an is
 ---
 
 ## 📄 **License**
-MIT License © 2024
+MIT License © 2021
 
 ---
 
