@@ -197,7 +197,6 @@ cc = ContentCoder(dicFilename='dictionary.dic', fileEncoding='utf-8-sig')
 
 with open("Comments.csv", "r", encoding="utf-8-sig") as csvfile:
     reader = csv.DictReader(csvfile)
-    total_lines = sum(1 for _ in open("Comments.csv")) - 1  # Count rows
 
     for row in tqdm(reader, desc="Processing", unit=" comments"):
         text = row["body"]
