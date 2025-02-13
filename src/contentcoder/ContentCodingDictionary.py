@@ -13,7 +13,7 @@ import io
 import json
 
 from itertools import zip_longest
-from create_export_dir import create_export_dir
+from .create_export_dir import create_export_dir
 
 
 containsWildcardRegex = re.compile(r'(?<!\\\\)\*')

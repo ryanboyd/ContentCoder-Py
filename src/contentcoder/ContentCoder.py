@@ -1,19 +1,16 @@
 #!/usr/bin/env python
 # encoding: utf-8
-# python 3.9.2
-# content_coder_py
-# updated on: 2023-02-14
+
 # by Ryan L. Boyd, Ph.D.
-# ryan@ryanboyd.io
 
 import csv
 import re
 
 re._MAXCACHE = 10000
 
-import happiestfuntokenizing
-from ContentCodingDictionary import ContentCodingDictionary, containsWildcard
-from create_export_dir import create_export_dir
+from . import happiestfuntokenizing
+from .ContentCodingDictionary import ContentCodingDictionary, containsWildcard
+from .create_export_dir import create_export_dir
 
 class ContentCoder:
 
@@ -271,7 +268,7 @@ class ContentCoder:
                 resultsRawFreq['BigWords'] += int(1)
                 resultsRelativeFreq['BigWords'] += singleWordRelFreqValue
 
-        if resultsRawFreq['WC'] > 0
+        if resultsRawFreq['WC'] > 0:
             resultsRelativeFreq['AllPunct'] = resultsRawFreq['AllPunct'] / resultsRawFreq['WC']
             resultsRelativeFreq['Period'] = resultsRawFreq['Period'] / resultsRawFreq['WC']
             resultsRelativeFreq['Comma'] = resultsRawFreq['Comma'] / resultsRawFreq['WC']
