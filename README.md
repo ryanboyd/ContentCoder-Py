@@ -1,6 +1,3 @@
-### ContentCoder
-
-```md
 # ContentCoder
 
 ContentCoder is a Python-based text analysis tool that enables users to process and analyze text using custom linguistic dictionaries. It is inspired by tools like **LIWC (Linguistic Inquiry and Word Count)** and provides robust methods for tokenization, text analysis, and frequency calculations.
