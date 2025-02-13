@@ -3,7 +3,7 @@
 ![AI Reading Machine](images/DALL·E%202023-02-01%2016.58.23%20-%20a%20machine%20that%20reads%20books%20and%20has%20good%20ideas,%20high%20quality%203d%20digital%20art.png)
 
 
-ContentCoder is a Python-based text analysis tool that enables users to process and analyze text using custom linguistic dictionaries. It is inspired by tools like **LIWC (Linguistic Inquiry and Word Count)** and provides robust methods for tokenization, text analysis, and frequency calculations.
+ContentCoder is a Python-based text analysis tool that enables users to process and analyze text using custom linguistic dictionaries. It is inspired by tools like **LIWC (Linguistic Inquiry and Word Count)** and provides robust methods for tokenization, text analysis, and frequency calculations. As noted in a much older version of the README.MD, this is a stripped-down, feature-incomplete version of several tools used in past projects.
 
 ## 🔥 Features
 
