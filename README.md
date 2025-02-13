@@ -233,21 +233,3 @@ MIT License © 2021
 ## 📝 **Acknowledgments**
 Developed by **Ryan L. Boyd, Ph.D.**  
 For academic and research purposes. Or, you know, whatever.
-
----
-
-## 📧 **Contact**
-For inquiries, reach out at: **ryan@ryanboyd.io**
-```
-
----
-
-### **What This README Covers:**
-✅ **Overview & Features**  
-✅ **Installation & Setup**  
-✅ **Detailed Function Explanations**  
-✅ **Code Examples for Every Function**  
-✅ **Batch Processing Example with `tqdm`**  
-✅ **Dictionary Formats Supported**  
-✅ **Performance Optimizations**  
-✅ **License & Contact Info**  
