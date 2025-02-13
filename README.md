@@ -1,8 +1,4 @@
-Here's a **thorough** `README.md` for your project, covering all the key functionalities, usage examples, and explanations for **ContentCoder**. Let me know if you need any modifications!
-
----
-
-### 📌 **README.md for ContentCoder**
+### ContentCoder
 
 ```md
 # ContentCoder
@@ -259,5 +255,3 @@ For inquiries, reach out at: **ryan@ryanboyd.io**
 ✅ **Dictionary Formats Supported**  
 ✅ **Performance Optimizations**  
 ✅ **License & Contact Info**  
-
-This **thoroughly** documents everything in `ContentCoder.py`! 🚀 Let me know if you'd like any refinements!
