@@ -284,6 +284,9 @@ class ContentCoder:
         for i in range(0, totalStringLength):
             for numberOfWords in range(self.dict.maxWords, 0, -1):
 
+                if numberOfWords not in self.dict.dictDataStandard.keys():
+                    continue
+
                 # make sure that we don't overextend past our array
                 if (i + numberOfWords > totalStringLength):
                     continue
