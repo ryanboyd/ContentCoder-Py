@@ -1,41 +1,46 @@
 [build-system]
-
-requires = ["setuptools>=61.0"]
-
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
-
 [project]
-
 name = "contentcoder"
-
 version = "1.0.5"
-
-authors = [
-	{ name="Ryan L. Boyd", email="ryan@ryanboyd.io" },
-]
-
 description = "A generalized implementation of a dictionary-based content coder."
+readme = { file = "README.MD", content-type = "text/markdown" }
 
-readme = "README.MD"
+# Use an SPDX expression (string), not a TOML table
+license = "MIT"
+
+# Ensure license files are included in the sdist/wheel
+license-files = ["LICENSE"]
 
 requires-python = ">=3.10"
+dependencies = []
 
-dependencies=[]
-
-classifiers = [
-	"Programming Language :: Python :: 3",
-	"License :: OSI Approved :: MIT License",
-	"Operating System :: OS Independent",
+authors = [
+  { name = "Ryan L. Boyd", email = "ryan@ryanboyd.io" },
 ]
 
-[tool.setuptools]
-package-dir = { "" = "src" }
-packages = ["contentcoder"]
-include-package-data = true
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  # add if you test them:
+  # "Programming Language :: Python :: 3.11",
+  # "Programming Language :: Python :: 3.12",
+  "Operating System :: OS Independent",
+]
 
 [project.urls]
-
 Homepage = "https://github.com/ryanboyd/ContentCoder-Py"
-
 Issues = "https://github.com/ryanboyd/ContentCoder-Py/issues"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.package-dir]
+"" = "src"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["contentcoder*"]
