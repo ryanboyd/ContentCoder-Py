@@ -18,7 +18,8 @@ class ContentCoder:
                  dicFilename:str='test_files/EmpathDefaultDictionary.dic',
                  fileEncoding:str='utf-8-sig',
                  dictString:str=None,
-                 dictFormat:str="2007"):
+                 dictFormat:str="2007",
+                 keepZeroWeights:bool=False):
 
         self.PunctStopList = frozenset(["`", "´", "~", "!", "@", "#", "$", "%", "^", "&", "*",
                                         "(", ")", "_", "+", "-", "–", "=", "[", "]", "\\", ";", "'",
@@ -66,12 +67,14 @@ class ContentCoder:
                                                 fromString=True,
                                                 dictString=dictString,
                                                 dictFormat=dictFormat,
-                                                abbreviations=self.AbbreviationDict)
+                                                abbreviations=self.AbbreviationDict,
+                                                keepZeroWeights=keepZeroWeights)
 
         else:
             self.dict = ContentCodingDictionary(dicFilename=dicFilename,
                                                 fileEncoding=fileEncoding,
-                                                abbreviations=self.AbbreviationDict)
+                                                abbreviations=self.AbbreviationDict,
+                                                keepZeroWeights=keepZeroWeights)
 
         # now that the dictionary is loaded, let's bump up the maximum
         # number of compiled regular expressions that we are caching to

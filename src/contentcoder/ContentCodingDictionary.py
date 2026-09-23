@@ -22,9 +22,20 @@ literalAsteriskRegex = re.compile(r'\\\\\\\*')
 class ContentCodingDictionary:
 
     def __init__(self, dicFilename, fileEncoding, fromString=False, dictString=None,
-                 dictFormat=None, abbreviations=None, verbose=True):
+                 dictFormat=None, abbreviations=None, verbose=True,
+                 keepZeroWeights=False):
 
         self.abbreviationDict = abbreviations
+
+        # In a content-coding dictionary a weight of 0 means "this term is not
+        # in this category", so dropping it is right and saves a lot of memory.
+        # In a set of word *norms* it means the opposite: somebody rated this
+        # word and the rating was zero. A third of the words in the Lancaster
+        # sensorimotor norms have a gustatory strength of exactly 0, and
+        # throwing those away would leave the mean taken over only the words
+        # that taste of something. So the caller says which kind of file this
+        # is, and the default is the old behaviour.
+        self.keepZeroWeights = keepZeroWeights
 
         self.wildcardMemory = {}
         self.maxWords = -1
@@ -179,13 +190,13 @@ class ContentCodingDictionary:
                     # category", which is a weight of 1.
                     if isinteger(entryCatMarker):
                         termWeight = int(entryCatMarker)
-                        if termWeight == 0:
+                        if termWeight == 0 and not self.keepZeroWeights:
                             continue
                         else:
                             dicCategories[self.catNames[i]] = termWeight
                     elif isfloat(entryCatMarker):
                         termWeight = float(entryCatMarker)
-                        if termWeight == 0:
+                        if termWeight == 0 and not self.keepZeroWeights:
                             continue
                         else:
                             dicCategories[self.catNames[i]] = termWeight

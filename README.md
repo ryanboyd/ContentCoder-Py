@@ -126,6 +126,21 @@ category with nothing matched comes back as `None` rather than `0`, because a
 text with no rated words in it doesn't have a concreteness of zero — it doesn't
 have one at all. `relativeFreq` is ignored in this mode.
 
+**One thing to set when you load a norm set:** pass `keepZeroWeights=True` to
+the constructor.
+
+```python
+cc = ContentCoder(dicFilename='Lancaster Sensorimotor.csv', keepZeroWeights=True)
+```
+
+In a content-coding dictionary a weight of `0` means "this term is *not* in
+this category", so it gets dropped on load and that saves a lot of memory. In a
+set of norms it means the opposite — somebody rated the word and the rating was
+zero. A third of the words in the Lancaster sensorimotor norms have a gustatory
+strength of exactly `0`, and dropping those would leave the mean taken over
+only the words that taste of something. The default stays `False` so nothing
+existing changes.
+
 ---
 
 ### 2. `GetResultsHeader()`
