@@ -171,14 +171,20 @@ class ContentCodingDictionary:
                 if entryCatMarker == '':
                     continue
                 else:
-                    if isfloat(entryCatMarker):
-                        termWeight = float(entryCatMarker)
+                    # integers get checked first now that isfloat() actually
+                    # works, because otherwise every whole-number weight would
+                    # come back as a float and change the type of everything
+                    # downstream for no good reason. An "X" (or anything else
+                    # that isn't a number) still means "this term is in this
+                    # category", which is a weight of 1.
+                    if isinteger(entryCatMarker):
+                        termWeight = int(entryCatMarker)
                         if termWeight == 0:
                             continue
                         else:
                             dicCategories[self.catNames[i]] = termWeight
-                    elif isinteger(entryCatMarker):
-                        termWeight = int(entryCatMarker)
+                    elif isfloat(entryCatMarker):
+                        termWeight = float(entryCatMarker)
                         if termWeight == 0:
                             continue
                         else:
@@ -769,15 +775,16 @@ class ContentCodingDictionary:
 # used while reading in the dictionary
 # to check for weighted dictionary
 def isfloat(value):
+    # this used to call int(value) on the *string*, and int("0.24") throws a
+    # ValueError, which the except then swallowed -- so we answered False for
+    # every decimal weight in every dicx, and those all fell through to a plain
+    # 1. Weighted dictionaries were being scored as if they weren't weighted.
+    # Whole numbers were unaffected, which is why it stayed hidden. All we
+    # actually need to know here is whether float() will take it.
     try:
         float(value)
-
-        if float(value) != int(value):
-            return True
-        else:
-            return False
-
-    except ValueError:
+        return True
+    except (TypeError, ValueError):
         return False
 
 def isinteger(value):
@@ -789,7 +796,7 @@ def isinteger(value):
         else:
             return False
 
-    except ValueError:
+    except (TypeError, ValueError):
         return False
 
 

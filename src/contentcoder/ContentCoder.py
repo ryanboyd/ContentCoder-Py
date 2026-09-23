@@ -194,11 +194,48 @@ class ContentCoder:
                 dropPunct=True,
                 retainCaptures=False,
                 returnTokens=False,
-                wildcardMem=True):
-        """Analyze a string and return the results."""
+                wildcardMem=True,
+                weightedMean=False):
+        """Analyze a string and return the results.
+
+        weightedMean=False is the way this has always worked: a category's
+        score is how much of the text landed in it, with each term's weight
+        counting for as much as the weight says. That's what you want when the
+        weights are something like probabilities.
+
+        weightedMean=True is for the other kind of weighted dictionary -- the
+        ones where the weights are *ratings* rather than amounts. Concreteness
+        norms, valence norms, that sort of thing. There, the number people
+        actually want is the average rating of the words that had one, not a
+        rate per word count, and the two are nowhere near each other. Turning
+        this on gives you, for every category, the mean of the weights of the
+        terms that matched, and None for a text where nothing matched at all
+        (which is genuinely "no answer" rather than zero -- a text with no
+        rated words doesn't have a concreteness of 0).
+
+        Each dictionary entry counts once, however many words it spans, so a
+        two-word entry rated 4.0 is one observation of 4.0 and not two.
+
+        In that mode you also get back '_MatchCounts' and '_MatchedWC': how
+        many entries matched per category, and how many words those entries
+        covered. Divide the second one by 'WC' and you have the share of the
+        text that was rated, which is what tells you whether to believe the
+        mean. relativeFreq doesn't mean anything here, so it's ignored.
+        """
 
         resultsRawFreq = {}
         resultsRelativeFreq = {}
+
+        # only allocated when we're actually going to use them
+        weightSums = {}
+        matchCounts = {}
+        matchedWC = {}
+
+        if weightedMean:
+            for cat in self.dict.catNames:
+                weightSums[cat] = 0.0
+                matchCounts[cat] = int(0)
+                matchedWC[cat] = int(0)
 
         resultsRawFreq['Dic'] = int(0)
         resultsRelativeFreq['Dic'] = 0.0
@@ -311,9 +348,15 @@ class ContentCoder:
                     # escaped in self.dict.dictDataStandard[numberOfWords], but it WILL
                     # still be escaped everywhere else in the dictionary
                     for cat in self.dict.dictTermCatMap[targetString].keys():
-                        incrementValue = numberOfWords * self.dict.dictTermCatMap[targetString][cat]
+                        termWeight = self.dict.dictTermCatMap[targetString][cat]
+                        incrementValue = numberOfWords * termWeight
                         resultsRawFreq[cat] += incrementValue
                         resultsRelativeFreq[cat] += incrementValue * singleWordRelFreqValue
+
+                        if weightedMean:
+                            weightSums[cat] += termWeight
+                            matchCounts[cat] += 1
+                            matchedWC[cat] += numberOfWords
 
                     # if we're retaining frequencies, we do that here
                     if retainCaptures:
@@ -334,9 +377,15 @@ class ContentCoder:
 
                     # increment frequencies for all of the categories associated with this term
                     for cat in self.dict.dictTermCatMap[wildcardEntry].keys():
-                        incrementValue = numberOfWords * self.dict.dictTermCatMap[wildcardEntry][cat]
+                        termWeight = self.dict.dictTermCatMap[wildcardEntry][cat]
+                        incrementValue = numberOfWords * termWeight
                         resultsRawFreq[cat] += incrementValue
                         resultsRelativeFreq[cat] += incrementValue * singleWordRelFreqValue
+
+                        if weightedMean:
+                            weightSums[cat] += termWeight
+                            matchCounts[cat] += 1
+                            matchedWC[cat] += numberOfWords
 
                     # if we're retaining frequencies, we do that here
                     if retainCaptures:
@@ -360,9 +409,15 @@ class ContentCoder:
 
                             # increment frequencies for all of the categories associated with this term
                             for cat in self.dict.dictTermCatMap[wildcardEntry].keys():
-                                incrementValue = numberOfWords * self.dict.dictTermCatMap[wildcardEntry][cat]
+                                termWeight = self.dict.dictTermCatMap[wildcardEntry][cat]
+                                incrementValue = numberOfWords * termWeight
                                 resultsRawFreq[cat] += incrementValue
                                 resultsRelativeFreq[cat] += incrementValue * singleWordRelFreqValue
+
+                                if weightedMean:
+                                    weightSums[cat] += termWeight
+                                    matchCounts[cat] += 1
+                                    matchedWC[cat] += numberOfWords
 
                             # if we're retaining frequencies, we do that here
                             if retainCaptures:
@@ -375,6 +430,24 @@ class ContentCoder:
         # add in numbers, if that's what we're doing
         resultsRawFreq, resultsRelativeFreq = self.AddNumbers(resultsRawFreq, resultsRelativeFreq,
                                                               numberCount, singleWordRelFreqValue)
+
+        # when we're after mean ratings rather than rates, we hand back the raw
+        # results with the category values swapped out for the averages. Keeping
+        # WC/Dic/BigWords/punctuation where they were means GetResultsHeader()
+        # and GetResultsArray() still work exactly as before.
+        if weightedMean:
+            for cat in self.dict.catNames:
+                if matchCounts[cat] > 0:
+                    resultsRawFreq[cat] = weightSums[cat] / matchCounts[cat]
+                else:
+                    resultsRawFreq[cat] = None
+
+            resultsRawFreq['_MatchCounts'] = matchCounts
+            resultsRawFreq['_MatchedWC'] = matchedWC
+
+            if returnTokens:
+                resultsRawFreq['tokenizedText'] = tokens
+            return resultsRawFreq
 
         if relativeFreq:
             if returnTokens:
@@ -415,11 +488,22 @@ def normal_round(num, ndigits=0):
     num: the value to round
     ndigits: the number of digits to round to
     """
+    # a category with nothing matched in weightedMean mode has no mean, which is
+    # not the same thing as a mean of zero, so None travels through untouched
+    # and lands in the output as an empty cell.
+    if num is None:
+        return None
+
+    # int() chops toward zero, so adding 0.5 only rounds correctly for positive
+    # numbers -- -0.36 was coming back as -0.3599. Negatives need the 0.5 taken
+    # off instead so that halves go away from zero the way they do going up.
+    # Positive numbers behave exactly as they always have.
     if ndigits == 0:
-        return int(num + 0.5)
+        return int(num + 0.5) if num >= 0 else int(num - 0.5)
     else:
         digit_value = 10 ** ndigits
-        return int(num * digit_value + 0.5) / digit_value
+        scaled = num * digit_value
+        return (int(scaled + 0.5) if scaled >= 0 else int(scaled - 0.5)) / digit_value
 
 
 if __name__ == '__main__':

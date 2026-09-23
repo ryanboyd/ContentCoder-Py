@@ -90,11 +90,41 @@ Analyzes a given text and returns a dictionary of results.
 - `retainCaptures` _(bool)_: If `True`, captures and stores wildcard-matched words.
 - `returnTokens` _(bool)_: If `True`, returns tokenized text.
 - `wildcardMem` _(bool)_: If `True`, speeds up wildcard processing by storing past matches.
+- `weightedMean` _(bool)_: If `True`, each category comes back as the **mean of the weights of the terms that matched**, rather than as a rate. See below.
 
 #### Example Usage:
 ```python
 result = cc.Analyze("Hello world! This is a test sentence.", returnTokens=True)
 ```
+
+#### Weighted dictionaries: rates vs. mean ratings
+
+There are two different kinds of weighted dictionary out there, and they want
+two different answers.
+
+When the weights are *amounts* — the eMFD, where a weight is roughly how much
+of a word belongs to a category — the default is what you want: the category
+score is how much of the text landed in it, with weights counted for as much as
+they say.
+
+When the weights are *ratings* — concreteness norms, valence norms, age of
+acquisition — a rate is meaningless. What you want is the average rating of the
+words that had one. Set `weightedMean=True` and that's what you get:
+
+```python
+result = cc.Analyze(text, weightedMean=True)
+
+result['Concreteness']              # mean rating of the matched words, or None
+result['_MatchCounts']['Concreteness']   # how many entries matched
+result['_MatchedWC']['Concreteness']     # how many words those entries covered
+result['_MatchedWC']['Concreteness'] / result['WC']   # share of text that was rated
+```
+
+Each dictionary entry counts once no matter how many words it spans, so a
+two-word entry rated 4.0 is a single observation of 4.0 rather than two. A
+category with nothing matched comes back as `None` rather than `0`, because a
+text with no rated words in it doesn't have a concreteness of zero — it doesn't
+have one at all. `relativeFreq` is ignored in this mode.
 
 ---
 
