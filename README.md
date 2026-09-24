@@ -126,6 +126,15 @@ category with nothing matched comes back as `None` rather than `0`, because a
 text with no rated words in it doesn't have a concreteness of zero — it doesn't
 have one at all. `relativeFreq` is ignored in this mode.
 
+#### Multi-word entries are consumed once
+
+If your dictionary holds both `ice cream` and `cream`, the phrase is matched
+and then skipped past — the `cream` inside it is not counted a second time on
+its own. (Before 1.3.0 it was: the line meant to skip ahead was written as
+`i += numberOfWords - 1` inside a `for i in range(...)`, which does nothing in
+Python, so overlapping entries were double counted. It came over from the C#
+version, where it works.)
+
 **One thing to set when you load a norm set:** pass `keepZeroWeights=True` to
 the constructor.
 

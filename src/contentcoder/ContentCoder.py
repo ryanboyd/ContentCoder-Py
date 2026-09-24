@@ -321,7 +321,22 @@ class ContentCoder:
         tokens = [x.replace('*', r'\*') for x in tokens]
 
         # let's go through and start analyzing!
-        for i in range(0, totalStringLength):
+        #
+        # This is a `while` rather than a `for i in range(...)` because the
+        # whole thing depends on being able to skip past a phrase once we have
+        # matched it. `i += numberOfWords - 1` inside a for loop does nothing
+        # in Python -- the loop rebinds i on the very next pass -- so a
+        # dictionary holding both "ice cream" and "cream" was counting the
+        # cream twice: once inside the phrase and once again on its own. That
+        # line came over from the C# version, where it works.
+        i = 0
+        while i < totalStringLength:
+
+            # how many tokens got consumed here. Stays 0 until something
+            # matches, and a match swallows its whole phrase so the words
+            # inside it can't be counted again on their own.
+            matchedWords = 0
+
             for numberOfWords in range(self.dict.maxWords, 0, -1):
 
                 if numberOfWords not in self.dict.dictDataStandard.keys():
@@ -366,7 +381,7 @@ class ContentCoder:
                         self.__RetainFrequency(targetString, targetString)
 
                     # make sure that we move along, little doggy
-                    i += numberOfWords - 1
+                    matchedWords = numberOfWords
                     break
 
                 # if we're using wildcard memory, this will help speed up previously-identified captures
@@ -395,7 +410,7 @@ class ContentCoder:
                         self.__RetainFrequency(wildcardEntry, targetString)
 
                     # make sure that we move along, little doggy
-                    i += numberOfWords - 1
+                    matchedWords = numberOfWords
                     break
 
                 # here, we do the wildcard stuff
@@ -427,8 +442,17 @@ class ContentCoder:
                                 self.__RetainFrequency(wildcardEntry, targetString)
 
                             # make sure that we move along, little doggy
-                            i += numberOfWords - 1
+                            matchedWords = numberOfWords
                             break
+
+                    # the break above only gets us out of the wildcard list;
+                    # without this one we would carry on trying shorter spans
+                    # at a position we have already matched.
+                    if matchedWords:
+                        break
+
+            # nothing matched here, so we shuffle along by one and try again
+            i += matchedWords if matchedWords else 1
 
         # add in numbers, if that's what we're doing
         resultsRawFreq, resultsRelativeFreq = self.AddNumbers(resultsRawFreq, resultsRelativeFreq,
